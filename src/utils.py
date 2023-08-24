@@ -23,10 +23,10 @@ def mis_classified_images(model, device, test_loader):
   incorrect_examples = []
   incorrect_labels = []
   incorrect_pred = []
-  model.eval()
   for data,target in test_loader:
 
     data , target = data.to(device), target.to(device)
+    model = model.to(device)
     output = model(data) # shape = torch.Size([batch_size, 10])
     pred = output.argmax(dim=1, keepdim=True) #pred will be a 2d tensor of shape [batch_size,1]
     idxs_mask = ((pred == target.view_as(pred))==False).view(-1)
@@ -61,7 +61,7 @@ def plot_images(incorrect_examples, incorrect_labels,incorrect_pred, num_images)
 def display_gradcam(model, incorrect_examples, num_images, inv_normalize, transperancy, targets=None):
   # target_layers = [model.layer_2[-1]]
   target_layers = [model.layer_3.res_block.conv2]
-  cam = GradCAM(model=model, target_layers=target_layers, use_cuda=True)
+  cam = GradCAM(model=model, target_layers=target_layers, use_cuda=False)
   grad_cam_images = []
   # f, axes = plt.subplots(nrows=4, ncols=5, left=1, right=2)
   for i in range(num_images):
